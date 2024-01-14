@@ -40,15 +40,20 @@ export async function loadS3IntoPinecone(fileKey: string) {
   // 3. vectorise and embed individual documents
   const vectors = await Promise.all(documents.flat().map(embedDocument));
 
-  // 4. upload to pinecone
-  const client = await getPineconeClient();
-  const pineconeIndex = await client.index("pdf-bavard");
-  const namespace = pineconeIndex.namespace(convertToAscii(fileKey));
+// 4. Upload to pinecone
+    const client = await getPineconeClient();
+    const pineconeIndex = await client.index('chatpdf');
 
-  console.log("inserting vectors into pinecone");
-  await namespace.upsert(vectors);
+           // Upgraded pinecone tier  needed to Namespace
+          // const namespace = pineconeIndex.namespace(convertToAscii(fileKey));
 
-  return documents[0];
+    console.log("inserting vectors into pinecone");
+    await pineconeIndex.upsert(vectors);
+    
+          // upgraded pinecone tier needed for Namespace
+         // await namespace.upsert(vectors);
+
+    return documents[0]
 }
 
 async function embedDocument(doc: Document) {
